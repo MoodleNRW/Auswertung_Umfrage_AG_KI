@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LLMs an Hochschulen</title>
+<title>Umfrage LLMs an Hochschulen</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -24,7 +24,7 @@
   /* Top area: header + filters + nav (static, no scroll) */
   .top-bar { flex-shrink: 0; max-width: 1100px; width: 100%; margin: 0 auto;
              padding: 12px 20px 0; }
-  .header { text-align: center; padding: 16px 0 12px; }
+  .header { padding: 16px 0 10px; text-align: center; }
   .header h1 { font-size: 1.8em; color: var(--text); margin-bottom: 4px;
                font-weight: 700; letter-spacing: -0.5px; }
   .header .subtitle { color: var(--muted); font-size: 0.95em; }
@@ -150,6 +150,30 @@
   .scroll-area::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
   .scroll-area::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
+  /* Deckblatt-Metadaten (wie PDF-Titelseite) */
+  .deckblatt-card {
+    max-width: 720px; margin: 0 auto; padding: 14px 16px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    text-align: left; font-size: 0.88em; color: var(--text2);
+  }
+  .deckblatt-card .deck-rule {
+    width: 34%; max-width: 140px; height: 2px; margin: 0 auto 10px; border-radius: 1px;
+    background: var(--accent); opacity: 0.75;
+  }
+  .deckblatt-card .deck-inline { margin: 4px 0; color: var(--text2); line-height: 1.45; }
+  .deckblatt-card .deck-inline-label { color: var(--muted); font-weight: 600; }
+  .deckblatt-card .deck-sample { color: var(--text); }
+  .deckblatt-card .deck-license {
+    display: flex; align-items: center; justify-content: flex-start; gap: 10px; flex-wrap: nowrap;
+    margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--border);
+    text-align: left;
+  }
+  .deckblatt-card .deck-cc-badge { flex-shrink: 0; }
+  .deckblatt-card .deck-license-text {
+    font-size: 0.77em; color: var(--muted); max-width: none; margin: 0; line-height: 1.35;
+  }
+  .deckblatt-card a { color: var(--accent); }
+
   @media (max-width: 600px) {
     .filter-row { flex-direction: column; }
     .filter-group { min-width: 100%; }
@@ -157,6 +181,8 @@
     .header h1 { font-size: 1.4em; }
     .top-bar { padding: 8px 12px 0; }
     .scroll-inner { padding: 12px; }
+    .deckblatt-card .deck-license { flex-direction: column; text-align: center; }
+    .deckblatt-card .deck-license-text { max-width: none; }
   }
 </style>
 </head>
@@ -164,8 +190,7 @@
 
 <div class="top-bar">
   <div class="header">
-    <h1><a id="title-footer-link" href="#footer" style="color:inherit;text-decoration:none">LLMs an Hochschulen<sup style="font-size:0.45em;opacity:0.5;margin-left:0.3em;vertical-align:super">&#9432;</sup></a></h1>
-    <div class="subtitle" id="subtitle"></div>
+      <h1><a id="title-footer-link" href="#ch-Ueberblick" style="color:inherit;text-decoration:none">Umfrage LLMs an Hochschulen<sup style="font-size:0.45em;opacity:0.5;margin-left:0.3em;vertical-align:super">&#9432;</sup></a></h1>
   </div>
 
   
@@ -173,17 +198,22 @@
   <nav class="nav" id="nav"></nav>
 </div>
 
+<template id="deckblatt-template">
+  <p class="deck-inline"><span class="deck-inline-label">Autor:innen:</span> Cornelia Gamst · Freie Universität Berlin · Alexander Mikasch · Ruhr-Universität Bochum · Bastian Schmidt-Kuhl · Ruhr-Universität Bochum</p>
+    <p class="deck-inline"><span class="deck-inline-label">Erhebungszeitraum:</span> Februar 2026</p>
+    <p class="deck-inline deck-sample"><span class="deck-inline-label">Stichprobe:</span> 133 Teilnehmende von 78 Hochschulen aus der DACH-Region</p>
+    <p class="deck-inline"><span class="deck-inline-label">Kontakt:</span> <a href="mailto:bastian.schmidt-kuhl@ruhr-uni-bochum.de">bastian.schmidt-kuhl@ruhr-uni-bochum.de</a></p>
+    <div class="deck-license">
+    <img src="https://licensebuttons.net/l/by/4.0/88x31.png" width="88" height="31" alt="CC BY 4.0" class="deck-cc-badge" loading="lazy"/>
+    <p class="deck-license-text">
+    Lizenz: Creative Commons Namensnennung 4.0 International 
+    (<a href="https://creativecommons.org/licenses/by/4.0/deed.de" target="_blank" rel="license noopener noreferrer">CC BY 4.0</a>). Weitergabe und Bearbeitung mit Quellenangabe erlaubt.
+    </p></div>
+</template>
+
 <div class="scroll-area" id="scroll-area">
   <div class="scroll-inner">
     <div id="content"></div>
-    <div class="footer" id="footer">
-      <p>Umfrage durchgeführt im Februar 2026.</p>
-      <p style="margin-top:6px">Bei Fragen wenden Sie sich bitte an: <strong>bastian.schmidt-kuhl@ruhr-uni-bochum.de</strong></p>
-      <p style="margin-top:10px;font-size:0.9em;color:var(--muted)">
-        Die Auswertung erfolgt nach bestem Wissen und Gewissen. Eine Garantie für die Vollständigkeit
-        oder Richtigkeit der dargestellten Daten wird nicht übernommen.
-      </p>
-    </div>
   </div>
 </div>
 
@@ -448,89 +478,8 @@ function renderCategorical(canvasId, group, rows) {
   });
 }
 
-// --- University map coordinates (hardcoded, no API needed) ---
-const UNI_COORDS = {
-  "Albert-Ludwigs-Universität Freiburg": [47.997, 7.849],
-  "Bauhaus-Universität Weimar": [50.979, 11.323],
-  "Bergische Universität Wuppertal": [51.258, 7.150],
-  "Deutsche Sporthochschule Köln": [50.939, 6.960],
-  "Duale Hochschule Baden-Württemberg": [48.774, 9.182],
-  "ETH Zürich": [47.376, 8.548],
-  "FU Berlin": [52.454, 13.292],
-  "Fachhochschule Graubünden": [46.849, 9.531],
-  "Fachhochschule Kiel": [54.323, 10.123],
-  "Fachhochschule Lübeck": [53.868, 10.690],
-  "Fachhochschule Nordwestschweiz (FHNW)": [47.480, 8.225],
-  "Fachhochschule Oberösterreich": [48.156, 14.021],
-  "FernUniversität in Hagen": [51.357, 7.481],
-  "Friedrich-Schiller-Universität Jena": [50.927, 11.587],
-  "Göthe Universität Frankfurt": [50.128, 8.668],
-  "HAW Hamburg": [53.566, 9.984],
-  "HTW Dresden": [51.050, 13.737],
-  "HafenCity Universität Hamburg": [53.543, 10.006],
-  "Hochschule Bochum": [51.482, 7.222],
-  "Hochschule Darmstadt": [49.875, 8.659],
-  "Hochschule Emden/Leer": [53.366, 7.208],
-  "Hochschule Fulda": [50.561, 9.676],
-  "Hochschule Hof": [50.316, 11.918],
-  "Hochschule Karlsruhe": [49.009, 8.404],
-  "Hochschule Magdeburg-Stendal": [52.131, 11.640],
-  "Hochschule Mittweida": [50.987, 12.977],
-  "Hochschule München": [48.137, 11.576],
-  "Hochschule Neu-Ulm": [48.392, 9.989],
-  "Hochschule Niederrhein": [51.338, 6.584],
-  "Hochschule Offenburg": [48.473, 7.944],
-  "Hochschule Osnabrück": [52.279, 8.047],
-  "Hochschule Rhein-Waal": [51.789, 6.138],
-  "Hochschule für Angewandte Wissenschaften Hamburg": [53.566, 9.984],
-  "Hochschule für Technik Stuttgart": [48.793, 9.194],
-  "Hochschule für Technik und Wirtschaft Berlin": [52.457, 13.526],
-  "Hochschule für Technik und Wirtschaft des Saarlandes": [49.234, 7.004],
-  "Hochschuel für Technik und Wirtschaft des Saarlandes": [49.234, 7.004],
-  "Hochschule für Wirtschaft und Recht Berlin": [52.460, 13.325],
-  "Jade Hochschule": [53.527, 8.111],
-  "Johannes Gutenberg-Universität Mainz": [49.992, 8.247],
-  "Justus-Liebig-Universität Gießen": [50.584, 8.677],
-  "Katholische Hochschule Freiburg": [47.997, 7.849],
-  "Katholische Universität Eichstätt-Ingolstadt": [48.894, 11.188],
-  "LMU München": [48.151, 11.580],
-  "Leibniz Universität Hannover": [52.381, 9.717],
-  "Leuphana Universität Lüneburg": [53.245, 10.414],
-  "PH Burgenland": [47.845, 16.519],
-  "RWTH Aachen University": [50.774, 6.085],
-  "Ruhr-Universität Bochum": [51.444, 7.261],
-  "Ruprecht-Karls-Universität Heidelberg": [49.409, 8.694],
-  "Stiftung Tierärztliche Hochschule Hannover": [52.381, 9.717],
-  "TU Dresden": [51.025, 13.723],
-  "Technische Hochschule  Mannheim": [49.473, 8.481],
-  "Technische Hochschule Köln": [50.931, 6.930],
-  "Technische Hochschule Rosenheim": [47.856, 12.123],
-  "Technische Universität Berlin": [52.512, 13.326],
-  "Technische Universität Darmstadt": [49.878, 8.659],
-  "Technische Universität Ilmenau": [50.684, 10.919],
-  "Technische Universität Nürnberg": [49.452, 11.077],
-  "UMIT TIROL": [47.283, 11.509],
-  "UMIT TIROL - Privatuniversität für Gesundheitswissenschaften und -technologie": [47.283, 11.509],
-  "UMIT TIROL - Privatuniversität für Gesundheitswissenschaften und -technologien": [47.283, 11.509],
-  "Universität Bamberg": [49.898, 10.903],
-  "Universität Basel": [47.560, 7.589],
-  "Universität Bielefeld": [52.033, 8.532],
-  "Universität Bremen": [53.107, 8.851],
-  "Universität Mannheim": [49.484, 8.467],
-  "Universität Münster": [51.961, 7.626],
-  "Universität Paderborn": [51.712, 8.754],
-  "Universität Passau": [48.573, 13.454],
-  "Universität Potsdam": [52.399, 13.059],
-  "Universität Siegen": [50.917, 8.024],
-  "Universität Ulm": [48.422, 9.956],
-  "Universität Vechta": [52.726, 8.285],
-  "Universität zu Lübeck": [53.872, 10.705],
-  "Universitätsverbund in BW": [48.774, 9.182],
-  "WHU - Otto Beisheim School Of Management": [50.425, 7.621],
-  "Westfälische Hochschule": [51.517, 7.101],
-  "Westsächsische Hochschule Zwickau": [50.713, 12.497],
-  "Zürcher Hochschule für Angewandte Wissenschaften (ZHAW)": [47.499, 8.730],
-};
+// --- University map coordinates ---
+const UNI_COORDS = {"Albert-Ludwigs-Universität Freiburg": [47.997, 7.849], "Bauhaus-Universität Weimar": [50.979, 11.323], "Bergische Universität Wuppertal": [51.258, 7.15], "Deutsche Sporthochschule Köln": [50.939, 6.96], "Duale Hochschule Baden-Württemberg": [48.774, 9.182], "ETH Zürich": [47.376, 8.548], "FU Berlin": [52.454, 13.292], "Fachhochschule Graubünden": [46.849, 9.531], "Fachhochschule Kiel": [54.323, 10.123], "Fachhochschule Lübeck": [53.868, 10.69], "Fachhochschule Nordwestschweiz (FHNW)": [47.48, 8.225], "Fachhochschule Oberösterreich": [48.156, 14.021], "FernUniversität in Hagen": [51.357, 7.481], "Friedrich-Schiller-Universität Jena": [50.927, 11.587], "Göthe Universität Frankfurt": [50.128, 8.668], "HAW Hamburg": [53.566, 9.984], "HTW Dresden": [51.05, 13.737], "HafenCity Universität Hamburg": [53.543, 10.006], "Hochschule Bochum": [51.482, 7.222], "Hochschule Darmstadt": [49.875, 8.659], "Hochschule Emden/Leer": [53.366, 7.208], "Hochschule Fulda": [50.561, 9.676], "Hochschule Hof": [50.316, 11.918], "Hochschule Karlsruhe": [49.009, 8.404], "Hochschule Magdeburg-Stendal": [52.131, 11.64], "Hochschule Mittweida": [50.987, 12.977], "Hochschule München": [48.137, 11.576], "Hochschule Neu-Ulm": [48.392, 9.989], "Hochschule Niederrhein": [51.338, 6.584], "Hochschule Offenburg": [48.473, 7.944], "Hochschule Osnabrück": [52.279, 8.047], "Hochschule Rhein-Waal": [51.789, 6.138], "Hochschule für Angewandte Wissenschaften Hamburg": [53.566, 9.984], "Hochschule für Technik Stuttgart": [48.793, 9.194], "Hochschule für Technik und Wirtschaft Berlin": [52.457, 13.526], "Hochschule für Technik und Wirtschaft des Saarlandes": [49.234, 7.004], "Hochschuel für Technik und Wirtschaft des Saarlandes": [49.234, 7.004], "Hochschule für Wirtschaft und Recht Berlin": [52.46, 13.325], "Jade Hochschule": [53.527, 8.111], "Johannes Gutenberg-Universität Mainz": [49.992, 8.247], "Justus-Liebig-Universität Gießen": [50.584, 8.677], "Katholische Hochschule Freiburg": [47.997, 7.849], "Katholische Universität Eichstätt-Ingolstadt": [48.894, 11.188], "LMU München": [48.151, 11.58], "Leibniz Universität Hannover": [52.381, 9.717], "Leuphana Universität Lüneburg": [53.245, 10.414], "PH Burgenland": [47.845, 16.519], "RWTH Aachen University": [50.774, 6.085], "Ruhr-Universität Bochum": [51.444, 7.261], "Ruprecht-Karls-Universität Heidelberg": [49.409, 8.694], "Stiftung Tierärztliche Hochschule Hannover": [52.381, 9.717], "TU Dresden": [51.025, 13.723], "Technische Hochschule  Mannheim": [49.473, 8.481], "Technische Hochschule Köln": [50.931, 6.93], "Technische Hochschule Rosenheim": [47.856, 12.123], "Technische Universität Berlin": [52.512, 13.326], "Technische Universität Darmstadt": [49.878, 8.659], "Technische Universität Ilmenau": [50.684, 10.919], "Technische Universität Nürnberg": [49.452, 11.077], "UMIT TIROL": [47.283, 11.509], "UMIT TIROL - Privatuniversität für Gesundheitswissenschaften und -technologie": [47.283, 11.509], "UMIT TIROL - Privatuniversität für Gesundheitswissenschaften und -technologien": [47.283, 11.509], "Universität Bamberg": [49.898, 10.903], "Universität Basel": [47.56, 7.589], "Universität Bielefeld": [52.033, 8.532], "Universität Bremen": [53.107, 8.851], "Universität Mannheim": [49.484, 8.467], "Universität Münster": [51.961, 7.626], "Universität Paderborn": [51.712, 8.754], "Universität Passau": [48.573, 13.454], "Universität Potsdam": [52.399, 13.059], "Universität Siegen": [50.917, 8.024], "Universität Ulm": [48.422, 9.956], "Universität Vechta": [52.726, 8.285], "Universität zu Lübeck": [53.872, 10.705], "Universitätsverbund in BW": [48.774, 9.182], "WHU - Otto Beisheim School Of Management": [50.425, 7.621], "Westfälische Hochschule": [51.517, 7.101], "Westsächsische Hochschule Zwickau": [50.713, 12.497], "Zürcher Hochschule für Angewandte Wissenschaften (ZHAW)": [47.499, 8.73]};
 
 let _uniMap = null;
 
@@ -546,17 +495,41 @@ function renderUniversityMap(canvasId, group, rows) {
 
   // --- Leaflet map ---
   const mapEl = document.getElementById(canvasId + "-map");
-  if (mapEl) {
+    if (mapEl) {
     if (_uniMap) { _uniMap.remove(); _uniMap = null; }
-    _uniMap = L.map(mapEl).setView([51.2, 10.4], 6);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> © <a href='https://carto.com/'>CARTO</a>",
+    _uniMap = L.map(mapEl).setView([51.0, 10.8], 5);
+    // Browser-HTML wird oft per file:// geöffnet; OSM blockiert dann wegen fehlendem Referer.
+    // Daher KEIN OSM-Layer im Browser, sondern Carto light -> OpenTopoMap -> ruhiger Fallback.
+    const _tileTopo = L.tileLayer("https://tile.opentopomap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors, SRTM | Kartendarstellung: OpenTopoMap",
+      maxZoom: 17
+    });
+    const _tileCartoLight = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      subdomains: "abcd",
+      attribution: "© OpenStreetMap © CARTO",
       maxZoom: 19
-    }).addTo(_uniMap);
+    });
+    _tileCartoLight.addTo(_uniMap);
+    let _cartoErr = 0;
+    _tileCartoLight.on("tileerror", () => {
+      if (++_cartoErr < 3 || _uniMap._fallbackTiles) return;
+      _uniMap._fallbackTiles = true;
+      _uniMap.removeLayer(_tileCartoLight);
+      _tileTopo.addTo(_uniMap);
+      let _topoErr = 0;
+      _tileTopo.on("tileerror", () => {
+        if (++_topoErr < 3 || _uniMap._fallbackTiles2) return;
+        _uniMap._fallbackTiles2 = true;
+        _uniMap.removeLayer(_tileTopo);
+        mapEl.style.background = "#d9dde6";
+      });
+    });
 
+    const bounds = L.latLngBounds();
     items.forEach(([name, count]) => {
       const coords = UNI_COORDS[name];
       if (!coords) return;
+      bounds.extend(coords);
       L.circleMarker(coords, {
         radius: 10,
         fillColor: "#7CB9E8",
@@ -566,6 +539,13 @@ function renderUniversityMap(canvasId, group, rows) {
         fillOpacity: 0.65
       }).addTo(_uniMap).bindPopup(`<strong>${name}</strong>`);
     });
+    if (bounds.isValid()) {
+      _uniMap.fitBounds(bounds, {
+        paddingTopLeft: [20, 36],
+        paddingBottomRight: [52, 36],
+        maxZoom: 7,
+      });
+    }
   }
 
   // --- Full list ---
@@ -657,8 +637,9 @@ function esc(s) {
 function buildContent() {
   const nav = document.getElementById('nav');
   const content = document.getElementById('content');
+  const deckblattTemplate = document.getElementById('deckblatt-template');
 
-  let navHtml = '';
+  let navHtml = '<a data-target="ch-Ueberblick">Überblick</a> ';
   CHAPTERS.forEach(ch => {
     const id = 'ch-' + ch.replace(/[^a-zA-Z0-9]/g, '_');
     navHtml += `<a data-target="${id}">${ch}</a> `;
@@ -683,6 +664,12 @@ function buildContent() {
   });
 
   let html = '';
+  const deckblattHtml = deckblattTemplate ? deckblattTemplate.innerHTML.trim() : '';
+  html += '<div class="chapter" id="ch-Ueberblick">';
+  html += '<h2 class="chapter-title">Überblick</h2>';
+  html += '<div class="card">';
+  html += deckblattHtml ? `<div class="deckblatt-card">${deckblattHtml}</div>` : '';
+  html += '</div></div>';
   let currentChapter = '';
 
   GROUPS.forEach(g => {
@@ -751,8 +738,6 @@ function renderAll() {
 
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('subtitle').textContent =
-    `${RAW_ROWS.length} Teilnehmende | ${GROUPS.length} Fragengruppen`;
   const fc0 = document.getElementById('filter-count');
   if (fc0) fc0.textContent = `${RAW_ROWS.length} Antworten (kein Filter)`;
   initFilters();
@@ -760,13 +745,18 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAll();
   document.getElementById('title-footer-link').addEventListener('click', e => {
     e.preventDefault();
-    const footer = document.getElementById('footer');
+    const target = document.getElementById('ch-Ueberblick');
     const scrollArea = document.getElementById('scroll-area');
-    if (footer && scrollArea) {
-      scrollArea.scrollTo({ top: footer.offsetTop, behavior: 'smooth' });
-      footer.classList.remove('highlight-flash');
-      void footer.offsetWidth;
-      footer.classList.add('highlight-flash');
+    if (target && scrollArea) {
+      scrollArea.scrollTo({ top: target.offsetTop - scrollArea.offsetTop, behavior: 'smooth' });
+      target.classList.remove('highlight-flash');
+      void target.offsetWidth;
+      target.classList.add('highlight-flash');
+      target.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('highlight-flash');
+        void card.offsetWidth;
+        card.classList.add('highlight-flash');
+      });
     }
   });
 });
